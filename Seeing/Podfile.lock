@@ -1,0 +1,24 @@
+PODS:
+  - Alamofire (5.4.1)
+  - Reachability (3.2)
+  - SnapKit (5.0.1)
+
+DEPENDENCIES:
+  - Alamofire
+  - Reachability
+  - SnapKit (~> 5.0.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - Reachability
+    - SnapKit
+
+SPEC CHECKSUMS:
+  Alamofire: 2291f7d21ca607c491dd17642e5d40fdcda0e65c
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+
+PODFILE CHECKSUM: 7ffc482c2968f98eef27e2ba93d1ed66a97acd84
+
+COCOAPODS: 1.9.1
