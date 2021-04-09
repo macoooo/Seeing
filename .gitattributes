@@ -1,0 +1,2 @@
+Seeing/Pods/TXLiteAVSDK_TRTC/TXLiteAVSDK_TRTC/TXLiteAVSDK_TRTC.framework/TXLiteAVSDK_TRTC filter=lfs diff=lfs merge=lfs -text
+Seeing/Pods/AMap3DMap/MAMapKit.framework/MAMapKit filter=lfs diff=lfs merge=lfs -text

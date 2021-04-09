@@ -1,24 +1,94 @@
 PODS:
   - Alamofire (5.4.1)
+  - AMap3DMap (7.8.0):
+    - AMapFoundation (~> 1.6.4)
+  - AMapFoundation (1.6.5.1)
+  - AMapLocation (2.6.7):
+    - AMapFoundation (~> 1.6.4)
+  - AMapSearch (7.8.0):
+    - AMapFoundation (~> 1.6.4)
+  - Kingfisher (6.2.1)
+  - Material (3.1.8):
+    - Material/Core (= 3.1.8)
+  - Material/Core (3.1.8):
+    - Motion (~> 3.1.1)
+  - Motion (3.1.3):
+    - Motion/Core (= 3.1.3)
+  - Motion/Core (3.1.3)
+  - NVActivityIndicatorView (5.1.1):
+    - NVActivityIndicatorView/Base (= 5.1.1)
+  - NVActivityIndicatorView/Base (5.1.1)
   - Reachability (3.2)
+  - RxCocoa (6.1.0):
+    - RxRelay (= 6.1.0)
+    - RxSwift (= 6.1.0)
+  - RxRelay (6.1.0):
+    - RxSwift (= 6.1.0)
+  - RxSwift (6.1.0)
   - SnapKit (5.0.1)
+  - SwiftyJSON (4.3.0)
+  - Toast-Swift (5.0.0)
+  - TXIMSDK_iOS (5.1.56)
+  - TXLiteAVSDK_TRTC (8.5.10019)
 
 DEPENDENCIES:
   - Alamofire
+  - AMap3DMap
+  - AMapLocation
+  - AMapSearch
+  - Kingfisher (~> 6.0)
+  - Material
+  - NVActivityIndicatorView
   - Reachability
+  - RxCocoa (= 6.1.0)
+  - RxSwift (= 6.1.0)
   - SnapKit (~> 5.0.0)
+  - SwiftyJSON (~> 4.0)
+  - Toast-Swift (= 5.0.0)
+  - TXIMSDK_iOS
+  - TXLiteAVSDK_TRTC
 
 SPEC REPOS:
   trunk:
     - Alamofire
+    - AMap3DMap
+    - AMapFoundation
+    - AMapLocation
+    - AMapSearch
+    - Kingfisher
+    - Material
+    - Motion
+    - NVActivityIndicatorView
     - Reachability
+    - RxCocoa
+    - RxRelay
+    - RxSwift
     - SnapKit
+    - SwiftyJSON
+    - Toast-Swift
+    - TXIMSDK_iOS
+    - TXLiteAVSDK_TRTC
 
 SPEC CHECKSUMS:
   Alamofire: 2291f7d21ca607c491dd17642e5d40fdcda0e65c
+  AMap3DMap: 3e4fac78e3e023cefd47e7d7715ef5ea69bfd0fa
+  AMapFoundation: b67560a6f21aab81c8c12f84616b55a3833b6253
+  AMapLocation: a46c30d9930d0f3a3bd21139d8f845d10ac3f01d
+  AMapSearch: a62d0b2508270dff5a9b05ba3af9fc8843b48c8a
+  Kingfisher: e71c6fac2aebb1262888cabc2cb13d313362a48f
+  Material: a2a3f400a3b549d53ef89e56c58c4535b29db387
+  Motion: cf1e060e489f6661126374d5c60dbd2ed991605c
+  NVActivityIndicatorView: 1f6c5687f1171810aa27a3296814dc2d7dec3667
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  RxCocoa: 5c51f02d562cbd94629f6c26cf0c80fe4ab8d343
+  RxRelay: 483e1a19fad961b41f0b0c0bee506f46c1ae14fe
+  RxSwift: a834e5c538e89eca0cae86f403f4fbf0336786ce
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  SwiftyJSON: 6faa0040f8b59dead0ee07436cbf76b73c08fd08
+  Toast-Swift: 36f4720243c8582c2be243a60a51e193c761f541
+  TXIMSDK_iOS: 3704afc203450066095b9eb8321cff3f7e7d530a
+  TXLiteAVSDK_TRTC: 1bd12a676d8f8739da892f69233c1a8516d25931
 
-PODFILE CHECKSUM: 7ffc482c2968f98eef27e2ba93d1ed66a97acd84
+PODFILE CHECKSUM: 5393b3ae86cf22e08525a91279b0b15f0c40eb3e
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.1

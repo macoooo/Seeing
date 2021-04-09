@@ -43,13 +43,26 @@ class SFTabBarController: UITabBarController {
     }
     
     func viewControllerWithIndex(index: TabBarIndex) -> UIViewController {
-        return UIViewController()
+        switch index {
+        case .video:
+            return SFSeekHelpViewController()
+        case .life:
+            return SFInformationViewController()
+        case .mine:
+            return SFMineViewController()
+        case .map:
+            return SFPOIKeywordSearchViewController()
+        }
     }
     
     func tabBarItemTitleWithIndex(index: TabBarIndex) -> String? {
         switch index {
         case .video:
             return "视频"
+        case .mine:
+            return "我"
+        case .map:
+            return "盲道"
         default:
             return "生活"
         }

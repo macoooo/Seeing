@@ -7,16 +7,34 @@
 
 import UIKit
 import CoreData
+import UserNotifications
+
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, V2TIMAPNSListener {
 
-
+    var deviceToken: Data = Data()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            print("推送获取权限错误\(String(describing: error))")
+        }
+        registerNotification()
+        AMapServices.shared().apiKey = "e180023ca16b4d18e89b310739cfd955"
         return true
     }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        completionHandler()
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.badge, .sound])
+    }
+    
 
     // MARK: UISceneSession Lifecycle
 
@@ -77,5 +95,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("RegisterForRemoteNotificationsWithError\(error)")
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("获取到deviceToken:\(deviceToken)")
+        self.deviceToken = deviceToken
+    }
+    
+    private func registerNotification() {
+        UIApplication.shared.registerForRemoteNotifications()
+    }
 }
 
