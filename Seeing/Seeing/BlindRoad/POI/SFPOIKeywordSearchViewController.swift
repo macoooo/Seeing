@@ -10,6 +10,7 @@ import UIKit
 import AMapSearchKit
 import MAMapKit
 import AMapFoundationKit
+import RxSwift
 
 class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, UISearchBarDelegate, UIGestureRecognizerDelegate {
 
@@ -17,6 +18,8 @@ class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMa
     var search: AMapSearchAPI!
     var mapView: MAMapView!
     var customUserLocationView: MAAnnotationView!
+    var viewModel: SFPOIKeywordSearchViewModel = SFPOIKeywordSearchViewModel()
+    private var disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +29,15 @@ class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMa
         initMapView()
         initSearch()
         initSearchBar()
+        
+        let tipLabel = UILabel(frame: CGRect(x: self.view.frame.width - 150, y: 200, width: 150, height: 100))
+        tipLabel.backgroundColor = .white
+        self.view.addSubview(tipLabel)
+        tipLabel.text = "欢迎大家\n长按某处道路上传盲道问题"
+        tipLabel.textColor = .blue
+        tipLabel.numberOfLines = 0
+        tipLabel.textAlignment = .center
+        tipLabel.layer.cornerRadius = 40
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -47,10 +59,6 @@ class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMa
         mapView.delegate = self
         mapView.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight, UIView.AutoresizingMask.flexibleWidth]
         self.view.addSubview(mapView)
-        
-        let lpress = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gesture:)))
-        lpress.delegate = self
-//        mapView.addGestureRecognizer(lpress)
     }
     
     func initSearch() {
@@ -195,7 +203,7 @@ class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMa
         }
         
         var annos = Array<MAPointAnnotation>()
-        
+        var selectAnno = MAPointAnnotation()
         for aPOI in response.pois {
             let coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(aPOI.location.latitude), longitude: CLLocationDegrees(aPOI.location.longitude))
             let anno = MAPointAnnotation()
@@ -205,7 +213,25 @@ class SFPOIKeywordSearchViewController: UIViewController, MAMapViewDelegate, AMa
             anno.isSearch = true
             annos.append(anno)
         }
-        
+        if let anno = annos.first {
+            selectAnno = anno
+        }
+        viewModel.findRecentBlindRoad(latitude: selectAnno.coordinate.latitude, longitude: selectAnno.coordinate.longitude).subscribe { [weak self] (modelArray) in
+            guard let self = self else {
+                return
+            }
+            var annos = Array<MAPointAnnotation>()
+            for model in modelArray {
+                let anno = MAPointAnnotation()
+                anno.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(model.latitude), longitude: CLLocationDegrees(model.longitude))
+                anno.isSearch = false
+                annos.append(anno)
+            }
+            self.mapView.addAnnotations(annos)
+            self.mapView.showAnnotations(annos, animated: false)
+        } onError: { (error) in
+            print("获取用户个数错误\(error)")
+        }.disposed(by: disposeBag)
         mapView.addAnnotations(annos)
         mapView.showAnnotations(annos, animated: false)
         mapView.selectAnnotation(annos.first, animated: true)

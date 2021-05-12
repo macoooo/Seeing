@@ -7,12 +7,16 @@
 
 import UIKit
 import SnapKit
+import Alamofire
+import RxSwift
 
 class SFMineViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
    
     private var tableView = UITableView()
     private var textStringArray: [String] = []
     private var detailStringArray: [String] = []
+    private var viewModel = SFMineViewModel()
+    private var disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,8 +30,18 @@ class SFMineViewController: UIViewController, UITableViewDelegate, UITableViewDa
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "mineCell")
         self.view.addSubview(tableView)
         
-        textStringArray = ["用户名", "用户类型", "更改密码", "关于我们", "设置"]
-        detailStringArray = ["小志", "志愿者", "", "", ""]
+        let userModel = ProfileManager.shared.curUserModel
+        var typeStr: String = ""
+        var numberStr: String = ""
+        if userModel?.userModel.type == 0 {
+            typeStr = "视障人士"
+            numberStr = "被帮助次数"
+        } else {
+            typeStr = "志愿者"
+            numberStr = "帮助次数"
+        }
+        textStringArray = ["用户名", "用户类型", numberStr, "更改密码", "关于我们", "设置"]
+        detailStringArray = [userModel?.name ?? "", typeStr, String(ProfileManager.shared.curUserModel?.userModel.callNumber ?? 0), "", "", ""]
         
         let headerView = UIView(frame: CGRect(x: 0, y: 1, width: UIScreen.main.bounds.width, height: 100))
         tableView.tableHeaderView = headerView
@@ -52,8 +66,30 @@ class SFMineViewController: UIViewController, UITableViewDelegate, UITableViewDa
             make.centerY.equalToSuperview()
             make.top.equalTo(loveImageView.snp.top)
         }
-
+        
+        let footerView = UIView(frame: CGRect(x: 0, y: 1, width: UIScreen.main.bounds.width, height: 100))
+        tableView.tableFooterView = footerView
+        let exitLoginButton = UIButton(type: .custom)
+        exitLoginButton.frame = CGRect(x: 20, y: 10, width: UIScreen.main.bounds.width - 40, height: 50)
+        exitLoginButton.setTitle("退出登录", for: .normal)
+        exitLoginButton.layer.cornerRadius = 20
+        exitLoginButton.backgroundColor = .lightGray
+        exitLoginButton.addTarget(self, action: #selector(exitLoginAction), for: .touchUpInside)
+        footerView.addSubview(exitLoginButton)
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.getHelpNumber().subscribe { [weak self] (model) in
+            guard let self = self else {
+                return
+            }
+            self.detailStringArray[2] = String(model)
+            self.tableView.reloadData()
+        } onError: { (error) in
+            print("获取用户个数错误\(error)")
+        }.disposed(by: disposeBag)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -62,7 +98,7 @@ class SFMineViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell:UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "mineCell")
-        if indexPath.row == 2 {
+        if indexPath.row == 3 {
             cell.accessoryType = .disclosureIndicator
         } else {
             cell = UITableViewCell(style: .value1, reuseIdentifier: "mineCell")
@@ -74,19 +110,18 @@ class SFMineViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == 2 {
+        if indexPath.row == 3 {
             self.navigationController?.pushViewController(SFChangePwdViewController(), animated: true)
+        } else if indexPath.row == 4 {
+            self.navigationController?.pushViewController(SFAboutUsViewController(), animated: true)
         }
+        tableView.deselectRow(at: indexPath, animated: false)
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    @objc func exitLoginAction() {
+        self.view.window?.rootViewController = SFLoginViewController()
+        AF.request("http://192.168.1.105:8081/user/exitLogin?id=\(String(describing: ProfileManager.shared.curUserID()))", method: .get).response { (_) in }
+        ProfileManager.shared.removeLoginCache()
     }
-    */
 
 }

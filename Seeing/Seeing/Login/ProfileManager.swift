@@ -11,13 +11,26 @@ import RxSwift
 import RxRelay
 import Alamofire
 
-let loginBaseUrl = "https://xxx.com/release/"
+let userBaseUrl = "http://192.168.1.105:8081/user/"
+var sdkBusiId: Int32 = 26641
+//#if DEBUG
+//    sdkBusiId = 26641
+//#else
+//    sdkBusiId = 26642
+//#endif
 
 //LoginModel
+class ResultInfoModel: NSObject, Codable {
+    var code: Int = -1
+    @objc var message: String = ""
+    var result: String? = ""
+    var total: Int? = 0
+}
 class LoginModel: NSObject, Codable {
-     var errorCode: Int = -1
-    @objc var errorMessage: String = ""
-    var data: LoginResultModel? = nil
+    var code: Int = -1
+    @objc var message: String = ""
+    var result: MyUserModel? = nil
+    var total: Int? = 0
 }
 
  class LoginResultModel: NSObject, Codable {
@@ -27,16 +40,32 @@ class LoginModel: NSObject, Codable {
     @objc var avatar: String
     @objc var userId: String
     @objc var userSig: String = ""
+    @objc var userModel: MyUserModel
     
-    public init(userID: String) {
-        userId = "18391741628"
-        token = userID
-        phone = "18391741628"
-        name = "shutin"
-        userSig = GenerateTestUserSig.genTestUserSig(userID)
-        avatar = "https://imgcache.qq.com/qcloud/public/static//avatar1_100.20191230.png"
+    public init(userID: String, userModel: MyUserModel, userSig: String) {
+        self.userId = userID
+        self.token = userID
+        self.phone = userID
+//        name = "shutin"
+        self.name = userModel.userName
+        //客户端计算Sig的方法，现在改为服务端计算返回
+//        userSig = GenerateTestUserSig.genTestUserSig(userID)
+        self.userSig = userSig
+        self.userModel = userModel
+        avatar = ""
         super.init()
     }
+}
+
+class MyUserModel: NSObject, Codable {
+    @objc var id: String
+    @objc var phone: String
+    @objc var userName: String
+    @objc var userPassword: String
+    @objc var sex: Int = 1
+    @objc var type: Int = 1
+    @objc var callNumber: Int = 0
+    @objc var loginStatus: Int = 0
 }
 
 @objc class QueryModel: NSObject, Codable {
@@ -60,7 +89,7 @@ class LoginModel: NSObject, Codable {
     public init(userID: String) {
         userId = userID
         name = userID
-        avatar = "https://imgcache.qq.com/qcloud/public/static//avatar1_100.20191230.png"
+        avatar = ""
         phone = userID
         super.init()
     }
@@ -112,6 +141,7 @@ public class ProfileManager: NSObject {
     private override init() {}
     
     var phone = BehaviorRelay<String>(value: "")
+    var password = BehaviorRelay<String>(value: "")
     var code = BehaviorRelay<String>(value: "")
     var sessionId: String = ""
     var curUserModel: LoginResultModel? = nil
@@ -124,14 +154,30 @@ public class ProfileManager: NSObject {
     /// - Returns:是否可以自动登录
     public func autoLogin(success: @escaping ()->Void,
                           failed: @escaping (_ error: String)->Void) -> Bool {
-        let tokenKey = "com.tencent.trtcScences.demo"
+        let tokenKey = "com.qst.Seeing"
         if let cacheData = UserDefaults.standard.object(forKey: tokenKey) as? Data {
             do {
                 let cacheUser = try JSONDecoder().decode(LoginResultModel.self, from: cacheData)
                 curUserModel = cacheUser
+                print("用户model为\(curUserModel?.userSig)")
                 let fail: (_ error: String)->Void = { err in
                     failed(err)
                     UserDefaults.standard.set(nil, forKey: tokenKey)
+                }
+                TRTCCalling.shareInstance().imBusinessID = sdkBusiId
+                TRTCCalling.shareInstance().deviceToken = AppUtils.shared.appDelegate.deviceToken
+                self.IMLogin(userId: curUserModel?.userId ?? "", userSig: curUserModel?.userSig ?? "") { [weak self] in
+                    guard let self = self else {
+                        return
+                    }
+                    TRTCCalling.shareInstance().login(sdkAppID: UInt32(SDKAPPID), user: self.curUserModel?.userId ?? "" , userSig: self.curUserModel?.userSig ?? "") {
+                        print("\(self.curUserModel?.userId ?? "")Video Call login成功")
+                        
+                    } failed: { (code, error) in
+                        print("\(self.curUserModel?.userId ?? "")Video Call login失败\(error)")
+                    }
+                } failed: { (error) in
+                    print("IM登录失败\(error)")
                 }
                 login(success: success, failed: fail, auto: true)
                 return true
@@ -148,25 +194,49 @@ public class ProfileManager: NSObject {
     ///   - success: 成功
     ///   - failed: 失败
     ///   - error: 错误信息
-    public func sendVerifyCode(success: @escaping ()->Void,
+    public func sendVerifyCode(typeStr: String, success: @escaping ()->Void,
                                failed: @escaping (_ error: String)-> Void) {
-        let verifyCodeUrl = loginBaseUrl + "sms"
-        let phoneValue = phone.value
-        assert(phoneValue.count == 11)
-        let params = ["phone":phoneValue, "method":"getSms"] as [String : Any]
-        AF.request(verifyCodeUrl, method: .post, parameters: params).responseJSON { [weak self] (data) in
-            guard let self = self else {return}
-            if let respData = data.data, respData.count > 0 {
+        let verifyCodeUrl = userBaseUrl + "sendSms?phone=\(phone.value)&typeStr=\(typeStr)"
+        AF.request(verifyCodeUrl, method: .get).responseJSON { (response) in
+            if let respData = response.data, respData.count > 0 {
                 let decoder = JSONDecoder()
-                guard let result = try? decoder.decode(VerifyModel.self, from: respData) else {
-                    failed("VerifyModel decode失败")
-                    fatalError("VerifyModel decode失败")
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("发送验证码ResultInfoModel decode失败")
+                    return
+//                    fatalError("发送验证码ResultInfoModel decode失败")
                 }
-                if result.errorCode == 0 , let sessionID = result.data?.sessionId {
-                    self.sessionId = sessionID
+                if result.code == 0, result.message == "Ok" {
                     success()
                 } else {
-                    failed(result.errorMessage)
+                    failed(result.message)
+                }
+            } else {
+                failed("发送失败，请稍后重试")
+            }
+        }
+    }
+    
+    /// 注册
+    /// - Parameters:
+    ///   - success: 成功
+    ///   - failed: 失败
+    @objc public func register(success: @escaping ()->Void,
+                               failed: @escaping (_ error: String)->Void) {
+        let registerUrl = userBaseUrl + "register"
+        let params = ["phone":phone.value, "code":code.value] as [String : String]
+        AF.request(registerUrl, method: .post, parameters: params).responseJSON { [weak self] (data) in
+            guard self != nil else {return}
+            if let respData = data.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("注册ResultInfoModel decode失败")
+                    return
+//                    fatalError("注册ResultInfoModel decode失败")
+                }
+                if result.code == 0 {
+                    success()
+                } else {
+                    failed(result.message)
                 }
             } else {
                 failed("发送失败，请稍后重试")
@@ -180,22 +250,152 @@ public class ProfileManager: NSObject {
     ///   - failed: 登录失败
     ///   - error: 错误信息
     @objc public func login(success: @escaping ()->Void,
-                      failed: @escaping (_ error: String)->Void , auto: Bool = false) {
+                            failed: @escaping (_ error: String)->Void , auto: Bool = false) {
         let phoneValue = phone.value
+        let pwdValue = password.value
+        let loginUrl = userBaseUrl + "login?phone=\(phoneValue)&pwd=\(pwdValue)"
         if !auto {
-            assert(phoneValue.count > 0)
-            curUserModel = LoginResultModel(userID: phone.value)
+            AF.request(loginUrl, method: .get).responseJSON { [weak self] (data) in
+                guard let self = self else {return}
+                if let respData = data.data, respData.count > 0 {
+                    
+                    let decoder = JSONDecoder()
+                    guard let result = try? decoder.decode(LoginModel.self, from: respData) else {
+                        print("LoginModel decode失败\(respData)")
+                        failed("LoginModel decode失败")
+                        return
+//                        fatalError("LoginModel decode失败")
+                    }
+                    if result.code == 0 , let userData = result.result {
+                        self.curUserModel = LoginResultModel(userID: userData.id, userModel: userData, userSig: result.message)
+                        let tokenKey = "com.qst.Seeing"
+                        do {
+                            let cacheData = try JSONEncoder().encode(self.curUserModel)
+                            UserDefaults.standard.set(cacheData, forKey: tokenKey)
+                        } catch {
+                          print("Save Failed")
+                        }
+                        TRTCCalling.shareInstance().imBusinessID = sdkBusiId
+                        TRTCCalling.shareInstance().deviceToken = AppUtils.shared.appDelegate.deviceToken
+                        self.IMLogin(userId: userData.id, userSig: result.message) {
+                            TRTCCalling.shareInstance().login(sdkAppID: UInt32(SDKAPPID), user: userData.id , userSig: result.message) {
+                                print("\(userData.id)Video Call login成功")
+                                
+                            } failed: { (code, error) in
+                                print("Video Call login失败\(error)")
+                            }
+                        } failed: { (error) in
+                            print("IM登录失败\(error)")
+                        }
+
+                        success()
+                    } else {
+                        failed(result.message)
+                    }
+                } else {
+                    failed("发送失败，请稍后重试")
+                }
+            }
+        } else {
+            success()
         }
-        // cache data
-        let tokenKey = "com.tencent.trtcScences.demo"
-        do {
-            let cacheData = try JSONEncoder().encode(curUserModel)
-            UserDefaults.standard.set(cacheData, forKey: tokenKey)
-        } catch {
-          print("Save Failed")
-        }
-        success()
     }
+    
+    /// 设置密码
+    /// - Parameters:
+    ///   - pwd: 密码
+    ///   - success: 成功
+    ///   - failed: 失败
+    public func setPwd(pwd: String, success: @escaping ()->Void,
+                       failed: @escaping (_ error: String)->Void) {
+        let setPwdUrl = userBaseUrl + "setPwd"
+        let params = ["phone": phone.value, "pwd": pwd] as [String : String]
+        AF.request(setPwdUrl, method: .post, parameters: params).responseJSON { (data) in
+            if let respData = data.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("设置密码ResultInfoModel decode失败")
+                    return
+//                    fatalError("设置密码ResultInfoModel decode失败")
+                }
+                if result.code == 0 {
+                    success()
+                } else {
+                    failed(result.message)
+                }
+            } else {
+                failed("发送失败，请稍后重试")
+            }
+        }
+    }
+    
+    public func addHelpNumber(sponsorID: String, userID: String, success: @escaping ()->Void,
+                       failed: @escaping (_ error: String)->Void) {
+        let setPwdUrl = userBaseUrl + "addHelpNumberCount"
+        let params = ["sponsorID": sponsorID, "userID": userID] as [String : String]
+        AF.request(setPwdUrl, method: .post, parameters: params).responseJSON { (data) in
+            if let respData = data.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("addHelpNumber ResultInfoModel decode失败")
+                    return
+                }
+                if result.code == 0 {
+                    success()
+                } else {
+                    failed(result.message)
+                }
+            } else {
+                failed("发送失败，请稍后重试")
+            }
+        }
+    }
+    
+    public func setType(type: Int, success: @escaping ()->Void,
+                       failed: @escaping (_ error: String)->Void) {
+        let setPwdUrl = userBaseUrl + "setUserType"
+        let params = ["id": phone.value, "type": type] as [String : Any]
+        AF.request(setPwdUrl, method: .post, parameters: params).responseJSON { (data) in
+            if let respData = data.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("设置类型ResultInfoModel decode失败")
+                    return
+//                    fatalError("设置类型ResultInfoModel decode失败")
+                }
+                if result.code == 0 {
+                    success()
+                } else {
+                    failed(result.message)
+                }
+            } else {
+                failed("发送失败，请稍后重试")
+            }
+        }
+    }
+    
+    @objc public func forgetSetPwd(pwd: String, success: @escaping ()->Void,
+                                   failed: @escaping (_ error: String)->Void) {
+        let url = userBaseUrl + "foretSoSetPwd"
+        let params = ["id": phone.value, "pwd": pwd] as [String : String]
+        AF.request(url, method: .post, parameters: params).responseJSON { (data) in
+            if let respData = data.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    failed("forgetSetPwd ResultInfoModel decode失败")
+                    fatalError("forgetSetPwd ResultInfoModel decode失败")
+                }
+                if result.code == 0 {
+                    success()
+                } else {
+                    failed(result.message)
+                }
+            } else {
+                failed("发送失败，请稍后重试")
+            }
+        }
+    }
+    
     
     /// 设置昵称
     /// - Parameters:
@@ -205,7 +405,7 @@ public class ProfileManager: NSObject {
     ///   - error: 错误信息
     @objc public func setNickName(name: String, success: @escaping ()->Void,
                         failed: @escaping (_ error: String)->Void) {
-        let nameUrl = loginBaseUrl + "nickname"
+        let nameUrl = userBaseUrl + "nickname"
         guard let userId = curUserModel?.userId else {
             failed("注册失败，请稍后重试")
             return
@@ -220,7 +420,8 @@ public class ProfileManager: NSObject {
                 let decoder = JSONDecoder()
                 guard let result = try? decoder.decode(NameModel.self, from: respData) else {
                     failed("NameModel decode失败")
-                    fatalError("NameModel decode失败")
+                    return
+//                    fatalError("NameModel decode失败")
                 }
                 if result.errorCode == 0 {
                     success()
@@ -292,7 +493,7 @@ public class ProfileManager: NSObject {
     /// - Parameters:
     ///   - success: 成功
     ///   - failed: 失败
-    @objc func IMLogin(userSig: String, success: @escaping ()->Void, failed: @escaping (_ error: String)->Void) {
+    @objc func IMLogin(userId: String, userSig: String, success: @escaping ()->Void, failed: @escaping (_ error: String)->Void) {
         let config = TIMSdkConfig.init()
         config.sdkAppId = Int32(SDKAPPID)
         config.dbPath = NSHomeDirectory() + "/Documents/com_tencent_imsdk_data/"
@@ -302,17 +503,17 @@ public class ProfileManager: NSObject {
 //            failed("userID 错误")
 //            return
 //        }
-//        let user = String(userID)
-        let user = "18391741628"
+//        let user = String(user)
+//        let user = "18391741628"
         let loginParam = TIMLoginParam.init()
-        loginParam.identifier = user
+        loginParam.identifier = userId
         loginParam.userSig = userSig
         TIMManager.sharedInstance()?.login(loginParam, succ: {
             debugPrint("login success")
             success()
         }, fail: { (code, errorDes) in
             failed(errorDes ?? "")
-            debugPrint("login failed, code:\(code), error: \(errorDes ?? "nil")")
+            debugPrint("login failed, userId:\(userId) code:\(code), error: \(errorDes ?? "nil")")
         })
     }
     
@@ -324,8 +525,16 @@ public class ProfileManager: NSObject {
     }
     
     @objc public func removeLoginCache() {
-        let tokenKey = "com.tencent.trtcScences.demo"
+        let tokenKey = "com.qst.Seeing"
         UserDefaults.standard.set(nil, forKey: tokenKey)
+    }
+    
+    public func getLoginCache() -> Data? {
+        let tokenKey = "com.qst.Seeing"
+        guard let cacheData = UserDefaults.standard.object(forKey: tokenKey) as? Data else {
+            return nil
+        }
+        return cacheData
     }
     
     @objc public func curUserSig() -> String {

@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import Alamofire
+import RxSwift
+import RxCocoa
 
 class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
 
@@ -21,6 +24,10 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
         ("盲道道路被破坏", nil),
         ("其他", nil)
     ]
+    private var reasonType: Int = 0
+    private var reason: String = ""
+    private let disposeBag = DisposeBag()
+    let otherTextView = UITextView()
     
     init(coordinate: CLLocationCoordinate2D, reGeocode: AMapReGeocode) {
         self.coordinate = coordinate
@@ -50,6 +57,7 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
         textStringArray = ["经度", "纬度", "地址"]
         detailStringArray = [String(coordinate.latitude), String(coordinate.longitude), String(reGeocode.formattedAddress)]
         addressHeight = reGeocode.formattedAddress.heightWithFont(font: UIFont.systemFont(ofSize: 17), fixedWidth: 300)
+        print("盲道地址的高度为\(addressHeight)")
         
         let headerView = UIView(frame: CGRect(x: 0, y: 1, width: UIScreen.main.bounds.width, height: 100))
         tableView.tableHeaderView = headerView
@@ -88,7 +96,7 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
             if indexPath.row == 2 {
-                return addressHeight > 44 ? addressHeight : 44
+                return addressHeight > 20 ? addressHeight + 20: 44
             }
         }
         return 44
@@ -125,17 +133,20 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
                 guard let self = self else {
                     return
                 }
+                self.reasonType = index + 1
+                self.reason = title
                 textField.drawUp()
                 if index == self.titles.count - 1,
                     title == "其他" {
-                    let otherTextView = UITextView(frame: CGRect(x: 10, y: 100, width: width, height: 100))
-                    otherTextView.layer.borderWidth = 1
-                    otherTextView.layer.borderColor = UIColor.red.cgColor
-                    otherTextView.isEditable = true
-                    otherTextView.layer.cornerRadius = 10
-                    otherTextView.delegate = self
-                    otherTextView.returnKeyType = .done
-                    view.addSubview(otherTextView)
+                    self.otherTextView.frame = CGRect(x: 10, y: 100, width: width, height: 100)
+                    self.otherTextView.layer.borderWidth = 1
+                    self.otherTextView.layer.borderColor = UIColor.red.cgColor
+                    self.otherTextView.isEditable = true
+                    self.otherTextView.layer.cornerRadius = 10
+                    self.otherTextView.delegate = self
+                    self.otherTextView.returnKeyType = .done
+//                    otherTextView.rx.text.orEmpty.bind(to: self.reason).disposed(by: disposeBag)
+                    view.addSubview(self.otherTextView)
                 }
             }
             view.addSubview(textField)
@@ -156,6 +167,7 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
         }
         cell.textLabel?.text = textStringArray[indexPath.row]
         cell.detailTextLabel?.text = detailStringArray[indexPath.row]
+        cell.detailTextLabel?.numberOfLines = 0
         return cell
     }
     
@@ -163,6 +175,18 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
         self.navigationController?.popViewController(animated: true)
         self.doneBlock?()
         // 上传数据
+        if reasonType == self.titles.count,  otherTextView.text.count > 0 {
+            self.reason = otherTextView.text
+        }
+        let url = "http://192.168.105:8081/blindRoad/upload"
+        let params = ["latitude": coordinate.latitude, "longitude": coordinate.longitude, "reasonType":reasonType, "reason":reason, "uploadAddress":reGeocode.formattedAddress ?? "", "uploaderUserId": ProfileManager.shared.curUserID() ?? "", "uploaderUserName": ProfileManager.shared.curUserModel?.name ?? "", "uploaderPhone": ProfileManager.shared.curUserModel?.phone ?? ""] as [String : Any]
+        AF.request(url, method: .post, parameters: params).response { (response) in
+            if let respData = response.data, respData.count > 0 {
+                print("盲道数据上传成功\(respData)")
+            } else {
+                self.showAlert(info: ("提示","上传失败，请检查重试"))
+            }
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -177,5 +201,15 @@ class SFAnnotationDetailViewController: UIViewController, UITableViewDelegate, U
             return false
         }
         return true
+    }
+    
+    func showAlert(info: (title: String, message: String), leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
+        let alertController = UIAlertController.init(title: info.title, message: info.message, preferredStyle: .alert)
+        let leftAlertAction = UIAlertAction.init(title: "确定", style: .default) { (action) in
+            alertController.dismiss(animated: true, completion: nil)
+            leftAction?()
+        }
+        alertController.addAction(leftAlertAction)
+        self.present(alertController, animated: true, completion: nil)
     }
 }

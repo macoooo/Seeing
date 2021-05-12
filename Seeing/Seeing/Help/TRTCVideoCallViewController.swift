@@ -81,7 +81,6 @@ public class VideoCallingRenderView: UIView {
         if !noModel {
             cellUserLabel.text = model.name
             cellImgView.kf.setImage(with: URL(string: model.avatarUrl))
-//            cellImgView.sd_setImage(with: URL(string: model.avatarUrl), completed: nil)
             cellImgView.isHidden = model.isVideoAvaliable
             cellUserLabel.isHidden = model.isVideoAvaliable
             volumeProgress.progress = model.volume

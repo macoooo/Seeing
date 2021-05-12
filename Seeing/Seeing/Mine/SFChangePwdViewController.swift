@@ -6,8 +6,11 @@
 //
 
 import UIKit
+import Alamofire
 
 class SFChangePwdViewController: UIViewController {
+    let oldPwdView = SFPwdView(frame: .zero)
+    let newPwdView = SFPwdView(frame: .zero)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,7 +19,7 @@ class SFChangePwdViewController: UIViewController {
         //导航栏高度 + 状态栏高度
         let height = UIApplication.shared.statusBarFrame.size.height + 44
 
-        let oldPwdView = SFPwdView(frame: .zero)
+        
         self.view.addSubview(oldPwdView)
         oldPwdView.snp.makeConstraints { (make) in
             make.left.right.equalToSuperview()
@@ -25,14 +28,13 @@ class SFChangePwdViewController: UIViewController {
         }
         oldPwdView.setText(leftText: "旧密码", placeholder: "请输入旧密码")
         
-        let newPwdView = SFPwdView(frame: .zero)
         self.view.addSubview(newPwdView)
         newPwdView.snp.makeConstraints { (make) in
             make.left.right.equalToSuperview()
             make.top.equalTo(oldPwdView.snp.bottom).offset(4)
             make.height.equalTo(60)
         }
-        newPwdView.setText(leftText: "新密码", placeholder: "请输入6-18位字母和数字的组合")
+        newPwdView.setText(leftText: "新密码", placeholder: "请输入8-16位组合")
         
         let doneButton = UIButton()
         doneButton.setTitle("完成", for: .normal)
@@ -40,12 +42,45 @@ class SFChangePwdViewController: UIViewController {
         doneButton.backgroundColor = .lightGray
         doneButton.layer.cornerRadius = 30
         self.view.addSubview(doneButton)
+        doneButton.addTarget(self, action: #selector(changePwdAction), for: .touchUpInside)
         doneButton.snp.makeConstraints { (make) in
             make.left.equalTo(40)
             make.right.equalTo(-40)
             make.top.equalTo(newPwdView.snp.bottom).offset(60)
             make.height.equalTo(50)
         }
+    }
+    
+    @objc func changePwdAction() {
+        let url = userBaseUrl + "updatePwd"
+        let params = ["id": ProfileManager.shared.curUserID(), "oldPwd": oldPwdView.textField.text, "newPwd":newPwdView.textField.text]
+        AF.request(url, method: .post, parameters: params).response { (response) in
+            if let respData = response.data, respData.count > 0 {
+                let decoder = JSONDecoder()
+                guard let result = try? decoder.decode(ResultInfoModel.self, from: respData) else {
+                    print("更改密码ResultInfoModel decode失败")
+                    return
+//                    fatalError("更改密码ResultInfoModel decode失败")
+                }
+                if result.code == 0 {
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    self.showAlert(info: ("提示", result.message))
+                }
+            } else {
+                print("发送失败，请稍后重试")
+            }
+        }
+    }
+    
+    func showAlert(info: (title: String, message: String), leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
+        let alertController = UIAlertController.init(title: info.title, message: info.message, preferredStyle: .alert)
+        let leftAlertAction = UIAlertAction.init(title: "确定", style: .default) { (action) in
+            alertController.dismiss(animated: true, completion: nil)
+            leftAction?()
+        }
+        alertController.addAction(leftAlertAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

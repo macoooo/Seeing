@@ -24,6 +24,9 @@
 		04338ED426049AA100EAE602 /* SFWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04338ED326049AA100EAE602 /* SFWeatherView.swift */; };
 		0447200B26078C0B006BF53E /* SFBlindRoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0447200A26078C0B006BF53E /* SFBlindRoadViewController.swift */; };
 		04517F20260C894600F614CB /* SFAnnotationDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04517F1F260C894600F614CB /* SFAnnotationDetailViewController.swift */; };
+		046A3F3B263C34790058E93A /* SFChooseTypeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046A3F3A263C34790058E93A /* SFChooseTypeViewController.swift */; };
+		048A0AC7264044F10072C624 /* SFSeekHelpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048A0AC6264044F10072C624 /* SFSeekHelpViewModel.swift */; };
+		048A0ACF264258940072C624 /* WKWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048A0ACE264258940072C624 /* WKWebViewController.swift */; };
 		049B0936260CDDE6007E0423 /* String+StringHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B0935260CDDE6007E0423 /* String+StringHeight.swift */; };
 		049B093C260DBEDF007E0423 /* SFDropBoxTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B093B260DBEDF007E0423 /* SFDropBoxTextField.swift */; };
 		049B0944260DBFE4007E0423 /* SFDropBoxTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B0943260DBFE4007E0423 /* SFDropBoxTableViewCell.swift */; };
@@ -34,6 +37,9 @@
 		049B09EC260F7CBB007E0423 /* AppUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B09EB260F7CBA007E0423 /* AppUtils.swift */; };
 		049B09F826106311007E0423 /* GenerateTestUserSig.m in Sources */ = {isa = PBXBuildFile; fileRef = 049B09F726106311007E0423 /* GenerateTestUserSig.m */; };
 		049B0A0326106338007E0423 /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049B0A0226106338007E0423 /* ProfileManager.swift */; };
+		04A88C7C2642F24000AE55E4 /* SFPersonalInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A88C7B2642F24000AE55E4 /* SFPersonalInfoViewController.swift */; };
+		04A88C812642F55900AE55E4 /* SFAboutUsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A88C802642F55900AE55E4 /* SFAboutUsViewController.swift */; };
+		04A88C9E2643BD1600AE55E4 /* SFPOIKeywordSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A88C9D2643BD1600AE55E4 /* SFPOIKeywordSearchViewModel.swift */; };
 		04C096F82609D92000B777EF /* SFPOIKeywordSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C096F72609D92000B777EF /* SFPOIKeywordSearchViewController.swift */; };
 		04C096FD2609D92300B777EF /* TipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04C096FC2609D92300B777EF /* TipViewController.swift */; };
 		8FB6944425CF83D500753E46 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6944325CF83D500753E46 /* AppDelegate.swift */; };
@@ -46,7 +52,6 @@
 		8FB6945E25CF83D500753E46 /* SeeingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6945D25CF83D500753E46 /* SeeingTests.swift */; };
 		8FB6946925CF83D500753E46 /* SeeingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6946825CF83D500753E46 /* SeeingUITests.swift */; };
 		8FB6948125CF8E8100753E46 /* SFLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6948025CF8E8100753E46 /* SFLoginViewController.swift */; };
-		8FB6948925CF8EA200753E46 /* SFLoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6948825CF8EA200753E46 /* SFLoginViewModel.swift */; };
 		8FB6948E25CF97E900753E46 /* ThemeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6948D25CF97E900753E46 /* ThemeExtension.swift */; };
 		8FB6950725CFE4B900753E46 /* SFTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6950625CFE4B900753E46 /* SFTabBarController.swift */; };
 		8FB6951525D0E5EC00753E46 /* SFNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB6951425D0E5EC00753E46 /* SFNotification.swift */; };
@@ -85,6 +90,9 @@
 		04338ED326049AA100EAE602 /* SFWeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFWeatherView.swift; sourceTree = "<group>"; };
 		0447200A26078C0B006BF53E /* SFBlindRoadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFBlindRoadViewController.swift; sourceTree = "<group>"; };
 		04517F1F260C894600F614CB /* SFAnnotationDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFAnnotationDetailViewController.swift; sourceTree = "<group>"; };
+		046A3F3A263C34790058E93A /* SFChooseTypeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFChooseTypeViewController.swift; sourceTree = "<group>"; };
+		048A0AC6264044F10072C624 /* SFSeekHelpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSeekHelpViewModel.swift; sourceTree = "<group>"; };
+		048A0ACE264258940072C624 /* WKWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebViewController.swift; sourceTree = "<group>"; };
 		049B0935260CDDE6007E0423 /* String+StringHeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+StringHeight.swift"; sourceTree = "<group>"; };
 		049B093B260DBEDF007E0423 /* SFDropBoxTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SFDropBoxTextField.swift; sourceTree = "<group>"; };
 		049B0943260DBFE4007E0423 /* SFDropBoxTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFDropBoxTableViewCell.swift; sourceTree = "<group>"; };
@@ -108,6 +116,10 @@
 		049B09F62610630A007E0423 /* GenerateTestUserSig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GenerateTestUserSig.h; sourceTree = "<group>"; };
 		049B09F726106311007E0423 /* GenerateTestUserSig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenerateTestUserSig.m; sourceTree = "<group>"; };
 		049B0A0226106338007E0423 /* ProfileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
+		04A88C772642DE1E00AE55E4 /* Seeing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Seeing.entitlements; sourceTree = "<group>"; };
+		04A88C7B2642F24000AE55E4 /* SFPersonalInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFPersonalInfoViewController.swift; sourceTree = "<group>"; };
+		04A88C802642F55900AE55E4 /* SFAboutUsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFAboutUsViewController.swift; sourceTree = "<group>"; };
+		04A88C9D2643BD1600AE55E4 /* SFPOIKeywordSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFPOIKeywordSearchViewModel.swift; sourceTree = "<group>"; };
 		04B0BC642608DB5400FE1D23 /* AMapFoundationKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AMapFoundationKit.framework; path = ../../../Downloads/AMapFoundationKit.framework; sourceTree = "<group>"; };
 		04B0BC662608DB6000FE1D23 /* AMapSearchKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AMapSearchKit.framework; path = ../../../Downloads/AMapSearchKit.framework; sourceTree = "<group>"; };
 		04B0BC682608DB6C00FE1D23 /* MAMapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MAMapKit.framework; path = ../../../Downloads/MAMapKit.framework; sourceTree = "<group>"; };
@@ -130,7 +142,6 @@
 		8FB6946825CF83D500753E46 /* SeeingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeeingUITests.swift; sourceTree = "<group>"; };
 		8FB6946A25CF83D500753E46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8FB6948025CF8E8100753E46 /* SFLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFLoginViewController.swift; sourceTree = "<group>"; };
-		8FB6948825CF8EA200753E46 /* SFLoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFLoginViewModel.swift; sourceTree = "<group>"; };
 		8FB6948D25CF97E900753E46 /* ThemeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeExtension.swift; sourceTree = "<group>"; };
 		8FB6950625CFE4B900753E46 /* SFTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFTabBarController.swift; sourceTree = "<group>"; };
 		8FB6951425D0E5EC00753E46 /* SFNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFNotification.swift; sourceTree = "<group>"; };
@@ -173,6 +184,8 @@
 				04338EB02602546400EAE602 /* SFMineViewController.swift */,
 				04338EBD2603971F00EAE602 /* SFMineViewModel.swift */,
 				04338EB8260396FF00EAE602 /* SFChangePwdViewController.swift */,
+				04A88C7B2642F24000AE55E4 /* SFPersonalInfoViewController.swift */,
+				04A88C802642F55900AE55E4 /* SFAboutUsViewController.swift */,
 			);
 			path = Mine;
 			sourceTree = "<group>";
@@ -183,6 +196,7 @@
 				04338EC32603A2E100EAE602 /* SFInformationViewController.swift */,
 				04338ECB2604740C00EAE602 /* SFInformationViewModel.swift */,
 				04338ED326049AA100EAE602 /* SFWeatherView.swift */,
+				048A0ACE264258940072C624 /* WKWebViewController.swift */,
 			);
 			path = Information;
 			sourceTree = "<group>";
@@ -279,6 +293,7 @@
 				04517F1F260C894600F614CB /* SFAnnotationDetailViewController.swift */,
 				049B093B260DBEDF007E0423 /* SFDropBoxTextField.swift */,
 				049B0943260DBFE4007E0423 /* SFDropBoxTableViewCell.swift */,
+				04A88C9D2643BD1600AE55E4 /* SFPOIKeywordSearchViewModel.swift */,
 			);
 			path = POI;
 			sourceTree = "<group>";
@@ -328,6 +343,7 @@
 		8FB6944225CF83D500753E46 /* Seeing */ = {
 			isa = PBXGroup;
 			children = (
+				04A88C772642DE1E00AE55E4 /* Seeing.entitlements */,
 				0447200926078B59006BF53E /* BlindRoad */,
 				04338EC22603A2A200EAE602 /* Information */,
 				04338EAF2602544500EAE602 /* Mine */,
@@ -373,9 +389,9 @@
 				049B09EB260F7CBA007E0423 /* AppUtils.swift */,
 				8FB6951425D0E5EC00753E46 /* SFNotification.swift */,
 				8FB6948025CF8E8100753E46 /* SFLoginViewController.swift */,
-				8FB6948825CF8EA200753E46 /* SFLoginViewModel.swift */,
 				042518852610C592009FA2B9 /* SFRegisterViewController.swift */,
 				0425188A2610C770009FA2B9 /* SFSetPwdViewController.swift */,
+				046A3F3A263C34790058E93A /* SFChooseTypeViewController.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -401,6 +417,7 @@
 				049B0992260F6ED3007E0423 /* TRTCCallingCell.swift */,
 				049B098F260F6ED3007E0423 /* TRTCAudioCallViewController.swift */,
 				04338EA52600E9B600EAE602 /* SFSeekHelpViewController.swift */,
+				048A0AC6264044F10072C624 /* SFSeekHelpViewModel.swift */,
 				049B0990260F6ED3007E0423 /* TRTCCallingContactViewController.swift */,
 				049B0993260F6ED3007E0423 /* CallingUserModel.swift */,
 			);
@@ -608,6 +625,9 @@
 				8FB6948125CF8E8100753E46 /* SFLoginViewController.swift in Sources */,
 				8FB6948E25CF97E900753E46 /* ThemeExtension.swift in Sources */,
 				8FB6952325D0EBFD00753E46 /* SFHelpViewModel.swift in Sources */,
+				048A0ACF264258940072C624 /* WKWebViewController.swift in Sources */,
+				04A88C7C2642F24000AE55E4 /* SFPersonalInfoViewController.swift in Sources */,
+				04A88C812642F55900AE55E4 /* SFAboutUsViewController.swift in Sources */,
 				8FB6944825CF83D500753E46 /* ViewController.swift in Sources */,
 				8FB6944425CF83D500753E46 /* AppDelegate.swift in Sources */,
 				0425180B26106DAC009FA2B9 /* TRTCVideoCallViewController.swift in Sources */,
@@ -627,13 +647,15 @@
 				8FB6944E25CF83D500753E46 /* Seeing.xcdatamodeld in Sources */,
 				8FB6944625CF83D500753E46 /* SceneDelegate.swift in Sources */,
 				04338EA62600E9B600EAE602 /* SFSeekHelpViewController.swift in Sources */,
+				046A3F3B263C34790058E93A /* SFChooseTypeViewController.swift in Sources */,
 				0425185426106F21009FA2B9 /* CommonUtils.swift in Sources */,
+				048A0AC7264044F10072C624 /* SFSeekHelpViewModel.swift in Sources */,
 				049B0936260CDDE6007E0423 /* String+StringHeight.swift in Sources */,
 				049B0944260DBFE4007E0423 /* SFDropBoxTableViewCell.swift in Sources */,
 				049B09F826106311007E0423 /* GenerateTestUserSig.m in Sources */,
 				04338EC42603A2E100EAE602 /* SFInformationViewController.swift in Sources */,
-				8FB6948925CF8EA200753E46 /* SFLoginViewModel.swift in Sources */,
 				049B09A5260F6F1B007E0423 /* TRTCCallingModel.m in Sources */,
+				04A88C9E2643BD1600AE55E4 /* SFPOIKeywordSearchViewModel.swift in Sources */,
 				049B09A6260F6F1B007E0423 /* TRTCCalling+Signal.m in Sources */,
 				04C096F82609D92000B777EF /* SFPOIKeywordSearchViewController.swift in Sources */,
 				04338ED426049AA100EAE602 /* SFWeatherView.swift in Sources */,
@@ -815,8 +837,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4YS6K2LXTF;
+				CODE_SIGN_ENTITLEMENTS = Seeing/Seeing.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = LR22M9LHCJ;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -835,8 +859,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = shutinqiang.Seeing;
+				PRODUCT_BUNDLE_IDENTIFIER = shutinqiang.Seeingss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = seeingDevelop;
 				SWIFT_OBJC_BRIDGING_HEADER = "./Seeing/Swift-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -850,8 +875,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4YS6K2LXTF;
+				CODE_SIGN_ENTITLEMENTS = Seeing/Seeing.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = LR22M9LHCJ;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -870,8 +897,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = shutinqiang.Seeing;
+				PRODUCT_BUNDLE_IDENTIFIER = shutinqiang.Seeingss;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = seeingAdHoc;
 				SWIFT_OBJC_BRIDGING_HEADER = "./Seeing/Swift-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -86,6 +86,16 @@ class SFInformationViewController: UIViewController, UITableViewDelegate, UITabl
         cell.detailTextLabel?.numberOfLines = 0
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let model = dataSource[indexPath.row]
+        guard let infoURL = URL(string: model.url) else {
+            return
+        }
+        let controller = WKWebViewController(url: infoURL)
+        self.navigationController?.pushViewController(controller, animated: true)
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
 
     /*
     // MARK: - Navigation

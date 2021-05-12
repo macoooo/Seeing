@@ -15,12 +15,14 @@ enum TabBarIndex {
 }
 
 class SFTabBarController: UITabBarController {
+    let seekHelpController = SFSeekHelpViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         
         buildControllers()
+        TRTCCalling.shareInstance().add(seekHelpController)
         // Do any additional setup after loading the view.
     }
     
@@ -43,9 +45,14 @@ class SFTabBarController: UITabBarController {
     }
     
     func viewControllerWithIndex(index: TabBarIndex) -> UIViewController {
+        let userType = ProfileManager.shared.curUserModel?.userModel.type
         switch index {
         case .video:
-            return SFSeekHelpViewController()
+            if userType == 0 {
+                return seekHelpController
+            } else {
+                return SFHelpViewController()
+            }
         case .life:
             return SFInformationViewController()
         case .mine:

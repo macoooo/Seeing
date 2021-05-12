@@ -14,7 +14,8 @@ class SFSetPwdViewController: UIViewController, UITextFieldDelegate {
     private lazy var surePwdTextField: UITextField = UITextField()
     
     private lazy var doneButton: UIButton = UIButton()
-
+    var typeStr: String = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let bgImage = UIImage(named: "login_bg")
@@ -71,10 +72,54 @@ class SFSetPwdViewController: UIViewController, UITextFieldDelegate {
         textField.layer.cornerRadius = 23
         textField.delegate = self
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 0))
+//        textField.isSecureTextEntry = true
         textField.leftViewMode = .always
     }
     
     @objc func doneAction() {
-        
+        guard let pwd = pwdTextField.text, pwd.count >= 8, let surePwd = surePwdTextField.text, surePwd.count >= 8 else {
+            self.showAlert(info: ("提示", "您输入的密码长度不满足8位"))
+            return
+        }
+        if pwdTextField.text != surePwdTextField.text {
+            self.showAlert(info: ("提示", message: "您输入的密码长度不一致，请重新确认"))
+        } else {
+            if typeStr == "forgetPwd" {
+                ProfileManager.shared.forgetSetPwd(pwd: pwdTextField.text ?? "") {
+                    self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
+                } failed: { (errorMessage) in
+                    self.showAlert(info: ("提示", message: "设置密码失败"))
+                    print("设置密码失败:\(errorMessage)")
+                }
+
+            } else {
+                ProfileManager.shared.setPwd(pwd: pwdTextField.text ?? "") {
+                    self.present(SFChooseTypeViewController(), animated: true, completion: nil)
+                    print("设置密码成功")
+                } failed: { (errorString) in
+                    self.showAlert(info: ("提示", message: "设置密码失败"))
+                    print("设置密码失败:\(errorString)")
+                }
+            }
+        }
+    }
+    
+    func showAlert(info: (title: String, message: String), leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
+        let alertController = UIAlertController.init(title: info.title, message: info.message, preferredStyle: .alert)
+        let leftAlertAction = UIAlertAction.init(title: "确定", style: .default) { (action) in
+            alertController.dismiss(animated: true, completion: nil)
+            leftAction?()
+        }
+        alertController.addAction(leftAlertAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return true
     }
 }

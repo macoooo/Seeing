@@ -16,10 +16,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
-        window?.rootViewController = SFLoginViewController()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(loginSucceed), name: NotificationName.loginSucceed, object: nil)
+        let autoLoginResult = ProfileManager.shared.autoLogin {
+            
+        } failed: { (error) in
+            print("自动登录失败\(error)")
+        }
+        
+        if autoLoginResult {
+            NotificationCenter.default.post(name: NotificationName.loginSucceed, object: nil)
+        } else {
+            self.window?.rootViewController = SFLoginViewController()
+        }
+        guard let _ = (scene as? UIWindowScene) else { return }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

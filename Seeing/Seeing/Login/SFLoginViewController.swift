@@ -7,6 +7,9 @@
 
 import UIKit
 import SnapKit
+import Alamofire
+import RxSwift
+import RxCocoa
 
 class SFLoginViewController: UIViewController, UITextFieldDelegate {
     
@@ -19,6 +22,8 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
     private lazy var registerButton: UIButton = UIButton()
     
     private lazy var forgotPwdButton: UIButton = UIButton()
+    
+    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +43,7 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
         
         nameTextField.placeholder = "   请输入电话号码"
         setTextField(textField: nameTextField)
+        nameTextField.rx.text.orEmpty.bind(to: ProfileManager.shared.phone).disposed(by: disposeBag)
         self.view.addSubview(nameTextField)
         nameTextField.snp.makeConstraints { (make) in
             make.left.equalTo(40)
@@ -48,6 +54,8 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
         
         pwdTextField.placeholder = "   请输入密码"
         setTextField(textField: pwdTextField)
+//        pwdTextField.isSecureTextEntry = true
+        pwdTextField.rx.text.orEmpty.bind(to: ProfileManager.shared.password).disposed(by: disposeBag)
         self.view.addSubview(pwdTextField)
         pwdTextField.snp.makeConstraints { (make) in
             make.left.equalTo(nameTextField.snp.left)
@@ -71,6 +79,7 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
         registerButton.setTitle("立即注册", for: .normal)
         registerButton.setTitleColor(.gray, for: .normal)
         registerButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        registerButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
         self.view.addSubview(registerButton)
         registerButton.snp.makeConstraints { (make) in
             make.right.equalTo(loginButton.snp.right).offset(-8)
@@ -93,6 +102,7 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
         forgotPwdButton.setTitle("忘记密码？", for: .normal)
         forgotPwdButton.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         self.view.addSubview(forgotPwdButton)
+        forgotPwdButton.addTarget(self, action: #selector(forgetPwdAction), for: .touchUpInside)
         forgotPwdButton.snp.makeConstraints { (make) in
             make.left.equalTo(loginButton.snp.left).offset(8)
             make.width.equalTo(80)
@@ -112,20 +122,41 @@ class SFLoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func loginAction() {
-        NotificationCenter.default.post(name: NotificationName.loginSucceed, object: nil)
+        ProfileManager.shared.login {
+            NotificationCenter.default.post(name: NotificationName.loginSucceed, object: nil)
+        } failed: { (error) in
+            self.showAlert(info: ("登录失败", "您输入的密码错误,请重新输入"))
+            print("登录失败\(error)")
+        }
+//
+//        AF.request("http://192.168.1.243:8081/user/login?phone=\(String(describing: nameTextField.text))&pwd=\(String(describing: pwdTextField.text))", method: .get).responseJSON { (response) in
+//            if response.error == nil {
+//
+//            } else {
+//                print("登录网络请求错误\(response.error)")
+//            }
+//        }
+        
     }
     
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func registerAction() {
+        self.present(SFRegisterViewController(), animated: true, completion: nil)
     }
-    */
+    
+    @objc func forgetPwdAction() {
+        let registerVC = SFRegisterViewController()
+        registerVC.typeStr = "forgetPwd"
+        self.present(registerVC, animated: true, completion: nil)
+    }
+    
+    func showAlert(info: (title: String, message: String), leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
+        let alertController = UIAlertController.init(title: info.title, message: info.message, preferredStyle: .alert)
+        let leftAlertAction = UIAlertAction.init(title: "确定", style: .default) { (action) in
+            alertController.dismiss(animated: true, completion: nil)
+            leftAction?()
+        }
+        alertController.addAction(leftAlertAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
 
 }

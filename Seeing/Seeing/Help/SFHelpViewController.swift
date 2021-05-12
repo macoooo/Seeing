@@ -7,8 +7,14 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class SFHelpViewController: UIViewController {
+    let viewModel = SFHelpViewModel()
+    private var disposeBag = DisposeBag()
+    private var userCountModel: SFUserCountModel?
+    let blindLabel = UILabel()
+    let volunteerLabel = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,13 +31,12 @@ class SFHelpViewController: UIViewController {
             make.width.equalTo(100)
             make.height.equalTo(90)
         }
-        
-        let blindLabel = UILabel()
+
         blindLabel.textColor = .white
         blindLabel.numberOfLines = 0
         blindLabel.font = UIFont.systemFont(ofSize: 20)
         blindLabel.textAlignment = .center
-        let blindNumber = 100
+        let blindNumber = userCountModel?.blindCount ?? 0
         blindLabel.text = "视障者\n\(blindNumber)"
         self.view.addSubview(blindLabel)
         blindLabel.snp.makeConstraints { (make) in
@@ -41,12 +46,11 @@ class SFHelpViewController: UIViewController {
             make.height.equalTo(80)
         }
         
-        let volunteerLabel = UILabel()
         volunteerLabel.textColor = .white
         volunteerLabel.numberOfLines = 0
         volunteerLabel.font = UIFont.systemFont(ofSize: 20)
         volunteerLabel.textAlignment = .center
-        let volunteerNumber = 100
+        let volunteerNumber = userCountModel?.volunteerCount ?? 0
         volunteerLabel.text = "志愿者\n\(volunteerNumber)"
         self.view.addSubview(volunteerLabel)
         volunteerLabel.snp.makeConstraints { (make) in
@@ -126,6 +130,20 @@ class SFHelpViewController: UIViewController {
         
         
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.getUserCount().subscribe { [weak self] (model) in
+            guard let self = self else {
+                return
+            }
+            self.userCountModel = model
+            self.blindLabel.text = "视障者\n\(model.blindCount)"
+            self.volunteerLabel.text = "志愿者\n\(model.volunteerCount)"
+        } onError: { (error) in
+            print("获取用户个数错误\(error)")
+        }.disposed(by: disposeBag)
     }
     
 

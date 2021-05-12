@@ -34,6 +34,12 @@ protocol CallingViewControllerResponder: UIViewController {
 class SFSeekHelpViewController: UIViewController, TRTCCallingDelegate {
     var callVC: CallingViewControllerResponder? = nil
     var callType: CallType = .video
+    private let viewModel: SFSeekHelpViewModel = SFSeekHelpViewModel()
+    private var disposeBag = DisposeBag()
+    private var calledUserModel: SFVolunteerModel?
+    private var calledUserSig: String = ""
+    var sdkBusiId: Int32 = 0
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,44 +62,40 @@ class SFSeekHelpViewController: UIViewController, TRTCCallingDelegate {
 
         let guesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_ :)))
         self.view.addGestureRecognizer(guesture)
-        TRTCCalling.shareInstance().add(self)
+//        TRTCCalling.shareInstance().add(self)
         
+        #if DEBUG
+            sdkBusiId = 26641
+        #else
+            sdkBusiId = 26642
+        #endif
+        
+//        TRTCCalling.shareInstance().add(self)
         // Do any additional setup after loading the view.
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        let userID = "18391741628"
-//        let userSig = ProfileManager.shared.curUserSig()
-        let userSig = GenerateTestUserSig.genTestUserSig(userID)
-        var sdkBusiId: Int32 = 0
-        #if DEBUG
-            sdkBusiId = 18069
-        #else
-            sdkBusiId = 18070
-        #endif
-//        if V2TIMManager.sharedInstance()?.getLoginUser() == userID {
-            TRTCCalling.shareInstance().imBusinessID = sdkBusiId
-            TRTCCalling.shareInstance().deviceToken = AppUtils.shared.appDelegate.deviceToken
-            ProfileManager.shared.IMLogin(userSig: userSig) {
-                TRTCCalling.shareInstance().login(sdkAppID: UInt32(SDKAPPID), user: userID , userSig: userSig) {
-                    print("Video Call login成功")
-                } failed: { (code, error) in
-                    print("Video Call login失败\(error)")
-                }
-
-            } failed: { (error) in
-                print("登录IM失败\(error)")
+        
+        viewModel.seekVolunteer().subscribe { [weak self] (model, calledUserSig) in
+            guard let self = self else {
+                return
             }
-
-//        }
+            self.calledUserModel = model
+            self.calledUserSig = calledUserSig
+        } onError: { (error) in
+            print("寻找志愿者错误\(error)")
+        }.disposed(by: disposeBag)
     }
     
     @objc func longPress(_ gusture:UILongPressGestureRecognizer) {
         if(gusture.state == UIGestureRecognizer.State.began) {
+            guard let calledUserModel = calledUserModel else {
+                return
+            }
             var calledUser = CallingUserModel()
-            calledUser.name = "yantin"
-            calledUser.userId = "18191438102"
+            calledUser.name = calledUserModel.userName
+            calledUser.userId = calledUserModel.id
             calledUser.isVideoAvaliable = true
             self.showCallVC(invitedList: [calledUser])
             TRTCCalling.shareInstance().call(userID: calledUser.userId, type: .video)
@@ -107,6 +109,13 @@ class SFSeekHelpViewController: UIViewController, TRTCCallingDelegate {
     func onInvited(sponsor: String, userIds: [String], isFromGroup: Bool, callType: CallType) {
         debugPrint("log: onInvited sponsor:\(sponsor) userIds:\(userIds)")
         self.callType  = callType
+//        self.showAlert(info: ("通知", "是否接受来自视障者的求助"), actionTitle: ("sure: String", cancel: String), sureAction: <#T##() -> Void#>, cancelAction: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
+        ProfileManager.shared.addHelpNumber(sponsorID: sponsor, userID: userIds[0]) {
+            print("addHelpNumber 成功")
+        } failed: { (error) in
+            print("addHelpNumber失败\(error)")
+        }
+
         ProfileManager.shared.queryUserInfo(userID: sponsor, success: { [weak self] (user) in
             guard let self = self else {return}
             ProfileManager.shared.queryUserListInfo(userIDs: userIds, success: { (usermodels) in
@@ -121,6 +130,24 @@ class SFSeekHelpViewController: UIViewController, TRTCCallingDelegate {
         }) { (error) in
             
         }
+    }
+    
+    private func showAlert(info: (title: String, message: String),
+                   actionTitle: (sure: String, cancel: String),
+                   sureAction: @escaping () -> Void,
+                   cancelAction: (() -> Void)?) {
+        let alertController = UIAlertController.init(title: info.title, message: info.message, preferredStyle: .alert)
+        let sureAlertAction = UIAlertAction.init(title: actionTitle.sure, style: .default) { (action) in
+            sureAction()
+            alertController.dismiss(animated: false, completion: nil)
+        }
+        let cancelAlertAction = UIAlertAction.init(title: actionTitle.cancel, style: .cancel) { (action) in
+            cancelAction?()
+            alertController.dismiss(animated: false, completion: nil)
+        }
+        alertController.addAction(sureAlertAction)
+        alertController.addAction(cancelAlertAction)
+        self.present(alertController, animated: false, completion: nil)
     }
     
     private func onGroupCallInviteeListUpdate(userIds: [String]) {

@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
@@ -100,12 +101,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        
         print("获取到deviceToken:\(deviceToken)")
+//        UserDefaults.standard.set(deviceToken, forKey: "com.qst.deviceToken")
         self.deviceToken = deviceToken
     }
     
     private func registerNotification() {
         UIApplication.shared.registerForRemoteNotifications()
     }
+    
+    func dataToJSON(data: Data) -> AnyObject? {
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as AnyObject
+        } catch {
+            print(error)
+        }
+        return nil
+    }
+
+
 }
 
